@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream 11 - Fantasy Sports</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <img src="logo.png" alt="Dream 11 Logo" class="logo">
+            <h1>DREAM11</h1>
+            <p>Ready to play?</p>
+        </div>
+
+        <div class="auth-box">
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form">
+                <h2>Login</h2>
+                <div class="input-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p class="toggle-text">New user? <span id="show-signup" class="link">Sign Up</span></p>
+            </form>
+
+            <!-- Sign Up Form (Hidden by default) -->
+            <form id="signup-form" class="auth-form d-none">
+                <h2>Sign Up</h2>
+                <div class="input-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" name="username" placeholder="Choose a username" required>
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" placeholder="Create a password" required>
+                </div>
+                <div class="input-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" name="confirm" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Account</button>
+                <p class="toggle-text">Already have an account? <span id="show-login" class="link">Login</span></p>
+            </form>
+        </div>
+
+        <!-- Home Screen (Hidden by default) -->
+        <div id="home-screen" class="home-screen d-none">
+            <div class="user-greeting">
+                <h2>Welcome, <span id="user-display-name">User</span>!</h2>
+            </div>
+            
+            <div class="match-tabs">
+                <button class="match-tab active" data-status="live">Live</button>
+                <button class="match-tab" data-status="upcoming">Upcoming</button>
+                <button class="match-tab" data-status="completed">Results</button>
+            </div>
+            
+            <div id="matches-container" class="matches-container">
+                <!-- Matches will be injected by JS -->
+            </div>
+
+            <div class="actions">
+                <button id="leaderboard-btn" class="btn btn-secondary">Leaderboard</button>
+                <button id="logout-btn" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+
+        <!-- Match Details Screen (Hidden by default) -->
+        <div id="match-details-screen" class="match-details-screen d-none">
+            <div class="back-nav" id="back-to-home">
+                <span>&larr; Back</span>
+            </div>
+            <div class="match-header">
+                <h3>Match <span id="match-number-display">#</span></h3>
+                <div id="match-teams-display" class="match-teams-large">
+                    <!-- Teams display -->
+                </div>
+            </div>
+
+            <div class="match-actions">
+                <button id="create-team-btn" class="btn btn-primary">Create Team</button>
+                <button id="view-team-btn" class="btn btn-secondary">View/Edit Team</button>
+            </div>
+        </div>
+
+        <!-- Player Selection Screen (Step 1) -->
+        <div id="player-selection-screen" class="player-selection-screen d-none">
+            <div class="back-nav" id="back-to-match-details">
+                <span>&larr; Back</span>
+            </div>
+            <div class="selection-header">
+                <div class="selection-stats">
+                    <div class="stat-box">
+                        <span id="team-a-name">TEAM A</span>: <span id="team-a-count">0</span>
+                    </div>
+                    <div class="stat-box main-stat">
+                        <span id="total-selected">0</span>/11
+                    </div>
+                    <div class="stat-box">
+                        <span id="team-b-name">TEAM B</span>: <span id="team-b-count">0</span>
+                    </div>
+                </div>
+                <p class="selection-hint">Select 11 players (Min 1 from each team)</p>
+            </div>
+
+            <div class="selection-tabs" id="selection-tabs">
+                <button class="tab-btn active" data-role="WK">WK (1-8)</button>
+                <button class="tab-btn" data-role="BAT">BAT (1-8)</button>
+                <button class="tab-btn" data-role="AR">AR (1-8)</button>
+                <button class="tab-btn" data-role="BOWL">BOWL (1-8)</button>
+            </div>
+            
+            <div id="players-container" class="players-container"></div>
+
+            <div class="selection-hint" style="text-align: center; margin: 10px 0; font-size: 0.8rem; opacity: 0.6;">
+                Select at least 1 player from each role. Total 11 players.
+            </div>
+
+            <div class="actions fixed-bottom">
+                <button id="proceed-to-captain-btn" class="btn btn-primary d-none">Next</button>
+            </div>
+        </div>
+
+        <!-- Captain Selection Screen (Step 2) -->
+        <div id="captain-selection-screen" class="captain-selection-screen d-none">
+            <div class="back-nav" id="back-to-player-selection">
+                <span>&larr; Back</span>
+            </div>
+            <div class="selection-header">
+                <h3>Choose Captain & Vice-Captain</h3>
+                <p class="selection-hint">C gets 2x points, VC gets 1.5x points</p>
+            </div>
+
+            <div id="selected-players-list" class="captain-players-list"></div>
+
+            <div class="actions fixed-bottom" style="display: flex; gap: 10px;">
+                <button id="preview-team-btn-captain" class="btn btn-secondary" style="flex: 1;">Preview</button>
+                <button id="save-team-btn" class="btn btn-primary d-none" style="flex: 2;">Save Team</button>
+            </div>
+        </div>
+
+        <!-- Live Match Screen (Leaderboard) -->
+        <div id="live-match-screen" class="live-match-screen d-none">
+            <div class="back-nav" id="back-from-live">
+                <span>&larr; Back</span>
+            </div>
+            <div class="match-header">
+                <div class="live-indicator">● LIVE</div>
+                <h3 id="live-match-teams">IND VS AUS</h3>
+            </div>
+
+            <div id="live-match-scorecard" class="scorecard">
+                <!-- Scorecard data will be injected -->
+            </div>
+
+            <div class="leaderboard-section">
+                <h4>Leaderboard</h4>
+                <div id="leaderboard-list" class="leaderboard-list">
+                    <!-- Leaderboard items will be injected -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Team View Screen (replacing overlay) -->
+        <div id="live-team-view-screen" class="live-team-view-screen d-none">
+            <div class="back-nav" id="back-from-live-team">
+                <span>&larr; Back to Leaderboard</span>
+            </div>
+            <div class="match-header">
+                <div id="live-team-scorecard" class="scorecard"></div>
+                <h3 id="preview-user-name-title">User's Team</h3>
+            </div>
+            <div id="preview-players-list-container" class="captain-players-list"></div>
+        </div>
+
+        <!-- Global Leaderboard Screen -->
+        <div id="global-leaderboard-screen" class="global-leaderboard-screen d-none">
+            <div class="back-nav" id="back-from-global-leaderboard">
+                <span>&larr; Back</span>
+            </div>
+            <div class="match-header">
+                <h3>Global Leaderboard</h3>
+                <p class="selection-hint">Overall rankings across all users</p>
+            </div>
+            <div id="global-leaderboard-list" class="leaderboard-list">
+                <!-- Global users will be injected -->
+            </div>
+        </div>
+
+        <!-- Points Breakdown Screen -->
+        <div id="user-points-breakdown-screen" class="user-points-breakdown-screen d-none">
+            <div class="back-nav" id="back-from-points-breakdown">
+                <span>&larr; Back to Leaderboard</span>
+            </div>
+            <div class="match-header text-center">
+                <h3 id="breakdown-user-name">User's Points</h3>
+                <p class="selection-hint">Match-wise performance breakdown</p>
+            </div>
+            <div id="breakdown-list" class="leaderboard-list">
+                <!-- Breakdown items will be injected -->
+            </div>
+        </div>
+
+        <div id="team-view-screen" class="team-view-screen d-none">
+            <div class="back-nav" id="back-from-view">
+                <span>&larr; Back to Match</span>
+            </div>
+            <div class="selection-header">
+                <h3>Your Team</h3>
+                <p id="view-match-teams" class="selection-hint"></p>
+            </div>
+            <div id="view-players-list" class="captain-players-list"></div>
+
+            <div class="actions fixed-bottom" style="display: flex; gap: 10px;">
+                <button id="preview-team-btn-view" class="btn btn-secondary" style="flex: 1;">Preview</button>
+                <button id="edit-team-btn" class="btn btn-primary" style="flex: 2;">Edit Team</button>
+            </div>
+        </div>
+
+        <!-- Player Points Breakdown Screen -->
+        <div id="player-points-breakdown-screen" class="screen d-none">
+            <div class="screen-header">
+                <button class="back-btn" id="back-from-player-breakdown">←</button>
+                <h2 id="breakdown-player-name">Player Name</h2>
+                <div></div> <!-- Spacer -->
+            </div>
+            <div class="content" style="padding: 20px;">
+                <div class="glass-card" style="padding: 15px;">
+                    <div class="leaderboard-header" style="font-weight: bold; margin-bottom: 10px;">
+                        <span>Event</span>
+                        <span>Points</span>
+                    </div>
+                    <div id="player-breakdown-list" class="leaderboard-list">
+                        <!-- Items like: <div class="leaderboard-item"><span>Runs (45)</span><span>45</span></div> -->
+                    </div>
+                    <div class="leaderboard-header" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top:20px; padding-top:10px; font-weight: bold;">
+                        <span>Total Points</span>
+                        <span id="player-breakdown-total" style="color: var(--primary-red); font-size: 1.2rem;">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Preview Screen (Field View) -->
+        <div id="team-preview-screen" class="team-preview-screen d-none">
+            <div class="preview-header">
+                <button id="back-from-preview" class="back-btn">×</button>
+                <div class="preview-title">Team Preview</div>
+                <div></div> <!-- Spacer -->
+            </div>
+            <div class="preview-field" id="preview-field">
+                <div class="field-row" data-role="WK"></div>
+                <div class="field-row" data-role="BAT"></div>
+                <div class="field-row" data-role="AR"></div>
+                <div class="field-row" data-role="BOWL"></div>
+            </div>
+        </div>
+
+        <!-- Custom Logout Modal -->
+        <div id="logout-modal" class="modal-overlay d-none">
+            <div class="modal-content">
+                <h3>Logout Confirmation</h3>
+                <p>Are you sure you want to logout?</p>
+                <div class="modal-actions">
+                    <button id="logout-no" class="btn btn-secondary">No</button>
+                    <button id="logout-yes" class="btn btn-primary">Yes, Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
