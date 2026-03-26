@@ -308,11 +308,26 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Format time display
             let timeDisplay = "";
-            if (isLive) timeDisplay = "LIVE";
-            else if (isCompleted) timeDisplay = "Completed";
-            else {
-                const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-                timeDisplay = matchTime.toLocaleDateString('en-US', options);
+            let countdownDisplay = "";
+            if (isLive) {
+                timeDisplay = "LIVE NOW";
+            } else if (isCompleted) {
+                timeDisplay = "Completed";
+            } else {
+                // Show local time (PKT times stored with +05:00 will show as 7:30 PM for IST)
+                const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                const dateOptions = { month: 'short', day: 'numeric' };
+                timeDisplay = matchTime.toLocaleDateString('en-IN', dateOptions) + ', ' + matchTime.toLocaleTimeString('en-IN', timeOptions);
+
+                // Countdown to deadline
+                const diffMs = matchTime - now;
+                if (diffMs > 0) {
+                    const hrs  = Math.floor(diffMs / 3600000);
+                    const mins = Math.floor((diffMs % 3600000) / 60000);
+                    countdownDisplay = hrs > 0 ? `${hrs}h ${mins}m to deadline` : `${mins}m to deadline`;
+                } else {
+                    countdownDisplay = "Deadline passed";
+                }
             }
 
             const getInitials = (name) => name.split(' ').map(w => w[0]).join('').substring(0,3).toUpperCase();
@@ -341,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="timer-pill ${isLive ? 'live' : ''}">
                         ${isLive ? '<span class="live-dot">● </span>' : ''} ${timeDisplay}
                     </div>
+                    ${countdownDisplay ? `<div class="deadline-countdown">${countdownDisplay}</div>` : ''}
                 </div>
             `;
             card.addEventListener('click', () => openMatchDetails(m));
