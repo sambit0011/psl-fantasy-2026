@@ -169,11 +169,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    loginForm.addEventListener('submit', (e) => { 
+    loginForm.addEventListener('submit', async (e) => { 
         e.preventDefault(); 
-        const user = { username: loginForm.username.value };
-        localStorage.setItem('currentUser', JSON.stringify(user)); 
-        checkSession(); 
+        const username = loginForm.username.value;
+        const password = loginForm.password.value;
+
+        const btn = loginForm.querySelector('button');
+        const originalText = btn.textContent;
+        btn.textContent = 'Logging in...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: 'login', username, password })
+            });
+
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                showMsg('Login successful!', 'success');
+                localStorage.setItem('currentUser', JSON.stringify({ username }));
+                setTimeout(() => checkSession(), 1000);
+            } else {
+                showMsg(result.message || 'Invalid username or password', 'error');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showMsg('Error connecting to server. Please try again.', 'error');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
     });
 
     signupForm.addEventListener('submit', async (e) => { 
