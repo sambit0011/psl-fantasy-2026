@@ -206,11 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     signupForm.addEventListener('submit', async (e) => { 
         e.preventDefault(); 
-        const username = signupForm.username.value;
-        const password = signupForm.password.value;
-        const confirm = signupForm.confirm.value;
+        const username = document.getElementById('signup-username').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const confirm  = document.getElementById('signup-confirm').value;
 
+        if (!username) return showMsg('Username is required.', 'error');
         if (password !== confirm) return showMsg('Passwords do not match!', 'error');
+        if (password.length < 4) return showMsg('Password must be at least 4 characters.', 'error');
 
         const btn = signupForm.querySelector('button');
         const originalText = btn.textContent;
