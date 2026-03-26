@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Removed 'no-cors' to allow reading the response body. 
                 // Google Apps Script supports CORS for Web Apps.
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ action: 'signup', username, password })
             });
 
             const result = await response.json();
