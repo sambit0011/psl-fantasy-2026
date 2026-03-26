@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutNo = document.getElementById('logout-no');
 
     // 2. State Variables
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeT4s4jBidJs0aswq3IDqvNbiwa8JrMo95b1vHR0rkQneIfkcsOSL6gGyjctQuIwEb/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCq6U4VfGBWqTv8NmoDACPvrd7nHSzfZWbPg0enQ3TMjbZ6BEnCD6a71idMqBbU1ja/exec'; 
     let currentMatchId = null;
     let selectedPlayers = []; 
     let captainId = null;
