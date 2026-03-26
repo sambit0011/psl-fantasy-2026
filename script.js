@@ -227,32 +227,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000); // 20s timeout
+
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                // Removed 'no-cors' to allow reading the response body. 
-                // Google Apps Script supports CORS for Web Apps.
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ action: 'signup', username, password })
+                body: JSON.stringify({ action: 'signup', username, password }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeout);
 
             const result = await response.json();
 
             if (result.result === 'error') {
-                showMsg(result.message || 'Error occurred', 'error');
-                console.warn('Signup rejected by server:', result.message);
+                showMsg(result.message || 'Signup failed on server.', 'error');
                 return;
             }
 
-            showMsg('Account created successfully!', 'success');
-            localStorage.setItem('currentUser', JSON.stringify({ username }));
-            setTimeout(() => checkSession(), 1000);
+            showMsg('Account created! You can now login.', 'success');
+            signupForm.reset();
+            setTimeout(() => {
+                signupForm.classList.add('d-none');
+                loginForm.classList.remove('d-none');
+            }, 1500);
 
         } catch (error) {
+            if (error.name === 'AbortError') {
+                showMsg('Request timed out. Check your internet connection or try again.', 'error');
+            } else {
+                showMsg('Error: ' + error.message, 'error');
+            }
             console.error('Signup error:', error);
-            // If we can't read the response (CORS/Redirect), we can't be sure about the duplicate check.
-            // We'll advise the user to check their sheet or try logging in.
-            showMsg('Signup request sent! If you cannot login, the username might be taken.', 'success');
-            signupForm.reset(); 
         } finally {
             btn.textContent = originalText;
             btn.disabled = false;
